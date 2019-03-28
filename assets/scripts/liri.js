@@ -1,7 +1,7 @@
 
 require('dotenv').config();
-const fs = require('fs');
 const keys = require('./keys.js');
+const fs = require('fs');
 const axios = require('axios');
 const Spotify = require('node-spotify-api');
 
@@ -15,30 +15,43 @@ const nodeArguments = process.argv;
 //  container for nodeArguments formatted to URL specs
 let valueArg='';
 for (let i = 3; i < nodeArguments.length; i++) {
-  if (i > 3 && i < nodeArguments.length) {
-    valueArg = valueArg + "+" + nodeArguments[i];
+  if ((action==='movie-this')||(action==='concert-this')){
+    if (i > 3 && i < nodeArguments.length) {
+      valueArg = valueArg + "+" + nodeArguments[i];
+    }
+    else {
+      valueArg += nodeArguments[i];
+    }
   }
-  else {
-    valueArg += nodeArguments[i];
+  else if (action==='spotify-this-song'){
+    if (i > 3 && i < nodeArguments.length) {
+      valueArg = valueArg + " " + nodeArguments[i];
+    }
+    else {
+      valueArg += nodeArguments[i];
+    }
   }
-}
-
-//  container for nodeArguments formatted to Spotify specs
-let valueArgSpot='';
-for (let i = 3; i < nodeArguments.length; i++) {
-  if (i > 3 && i < nodeArguments.length) {
-    valueArgSpot = valueArgSpot + " " + nodeArguments[i];
-  }
-  else {
-    valueArgSpot += nodeArguments[i];
-  }
-}
+};
 
 const doSomethingQuery= function(){
-  
+  fs.readFile("random.txt", "utf8", function(err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    
+    let dataSong = data.split(",");
+    spotify.search({ type: 'track', query: dataSong[1] }, function(err, data) {
+      if (err) {
+        return console.log('Error occurred: ' + err);
+      }
+      console.log('hi there you wild and crazy animal');
+      console.log(`go to this link for the purpose of life: ${data.tracks.items[0].external_urls.spotify}`);
+    });
+  });
 }
 
 //  SWITCH for inputs
+
 switch (action) {
   case 'concert-this':
     let queryUrlConcert = 'https://rest.bandsintown.com/artists/' + valueArg + '/events?app_id=codingbootcamp'
@@ -51,12 +64,15 @@ switch (action) {
         console.log(`Date: ${response.data[0].datetime}`);
       });
     break;
-  case 'spotify this song':
-    spotify.search({ type: 'track', query: queryUrl(valueArgSpot) }, function(err, data) {
+  case 'spotify-this-song':
+    spotify.search({ type: 'track', query: valueArg }, function(err, data) {
       if (err) {
         return console.log('Error occurred: ' + err);
       }
-    console.log(data);
+      console.log(`Artist: ${data.tracks.items[0].artists[0].name}`);
+      console.log(`Song: ${data.tracks.items[0].name}`);
+      console.log(`Preview Link: ${data.tracks.items[0].external_urls.spotify}`);
+      console.log(`Album: ${data.tracks.items[0].album.name}`);
     });
     break;
   case 'movie-this':
