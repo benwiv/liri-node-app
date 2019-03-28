@@ -10,7 +10,7 @@ const spotify = new Spotify(keys.spotify);
 
 //  USER ARGUMENTS TAKEN
 const action = process.argv[2];
-const nodeArguments = process.argv
+const nodeArguments = process.argv;
 
 //  container for nodeArguments formatted to URL specs
 let valueArg='';
@@ -45,10 +45,10 @@ switch (action) {
     axios.get(queryUrlConcert)
       .then(function(response) 
       {
-        console.log(response);
-        console.log(`Venues: ${response.data.venue.name}`);
-        console.log(`Venues: ${response.data.venue.city}, ${response.data.venue.country}`);
-        console.log(`Venues: ${response.data.venue.datetime}`);
+        console.log(response.data[0]);
+        console.log(`Venue: ${response.data[0].venue.name}`);
+        console.log(`Location: ${response.data[0].venue.city}, ${response.data[0].venue.country}`);
+        console.log(`Date: ${response.data[0].datetime}`);
       });
     break;
   case 'spotify this song':
